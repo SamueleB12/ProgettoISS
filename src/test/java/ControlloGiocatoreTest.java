@@ -4,6 +4,7 @@ package com.ProgettoISS;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 
 public class ControlloGiocatoreTest {
     private Giocatore giocatore;
@@ -15,7 +16,8 @@ public class ControlloGiocatoreTest {
     @BeforeEach
     public void setUp() {
         gioco = new Gioco(); // Crea un'istanza del gioco
-        diario = new Diario("Recuperare l'oggetto di valore"); // Inizializza il diario
+        // Inizializza il diario
+        diario = new Diario();
         giocatore = Giocatore.getInstance();
         visuale = new Visuale("percorso_mappa.png", 1280, 720, gioco); // Passa l'istanza di Gioco
 
@@ -38,7 +40,8 @@ public class ControlloGiocatoreTest {
 
     @Test
     public void testInterazioneConOggetto() {
-        Oggetto broccolo = new Oggetto("Broccolo", true, 300, 200);
+        BufferedImage icona = null;
+        Oggetto broccolo = new Oggetto("Broccolo", "Un vegetale sano", icona, true, 300, 200);
         giocatore.aggiungiOggetto(broccolo); // Aggiungi un oggetto al giocatore
         // Simula la pressione del tasto Z per interagire con l'oggetto
         controlloGiocatore.keyPressed(new KeyEvent(new java.awt.Component() {}, 0, 0, 0, KeyEvent.VK_Z, ' '));

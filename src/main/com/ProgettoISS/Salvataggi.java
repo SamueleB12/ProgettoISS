@@ -31,7 +31,7 @@ public class Salvataggi {
             giocatore.setInventario(new Inventario()); // Se l'inventario è null, inizializzalo
         }
         if (giocatore.getDiario() == null) {
-            giocatore.setDiario(new Diario("Obiettivo iniziale")); // Se il diario è null, inizializzalo
+            giocatore.setDiario(new Diario()); // Se il diario è null, inizializzalo
         }
 
         // ✅ Creazione della cartella "saves" se non esiste

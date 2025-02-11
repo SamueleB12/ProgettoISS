@@ -1,17 +1,25 @@
 package com.ProgettoISS;
 
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Diario {
+public class Diario extends Oggetto {
     private List<String> enigmiCompletati;
     private List<String> enigmiNonCompletati;
     private String obiettivoPrincipale;
     private List<String> missioniPrincipali;
     private List<String> missioniSecondarie;
+    private BufferedImage icona; // Icona del diario
+
 
     // Costruttore senza argomenti
     public Diario() {
+        super("Diario", "Un diario per annotare missioni ed enigmi", null, false, 0, 0);
         this.obiettivoPrincipale = "Obiettivo non definito";
         this.enigmiCompletati = new ArrayList<>();
         this.enigmiNonCompletati = new ArrayList<>();
@@ -20,12 +28,32 @@ public class Diario {
     }
 
     // Costruttore con un argomento
-    public Diario(String obiettivoPrincipale) {
+    public Diario(String obiettivoPrincipale, String percorsoIcona) {
+        super("Diario", "Un diario per annotare missioni ed enigmi", caricaImmagine(percorsoIcona), false, 0, 0);
         this.obiettivoPrincipale = obiettivoPrincipale;
         this.enigmiCompletati = new ArrayList<>();
         this.enigmiNonCompletati = new ArrayList<>();
         this.missioniPrincipali = new ArrayList<>();
         this.missioniSecondarie = new ArrayList<>();
+        try {
+            this.icona = ImageIO.read(getClass().getResource(percorsoIcona));
+        } catch (IOException e) {
+            System.out.println("Errore caricamento immagine");
+        }
+    }
+
+    private static BufferedImage caricaImmagine(String percorsoIcona) {
+        try {
+            URL urlIcona = Diario.class.getResource(percorsoIcona);
+            if (urlIcona == null) {
+                System.err.println("Immagine non trovata: " + percorsoIcona);
+                return null;
+            }
+            return ImageIO.read(urlIcona);
+        } catch (IOException e) {
+            System.err.println("Errore nel caricamento dell'immagine: " + e.getMessage());
+            return null;
+        }
     }
 
     // ✅ Getter per ogni variabile
@@ -109,7 +137,11 @@ public class Diario {
         memento.ripristina(this);
     }
 
-    // ✅ Metodo per visualizzare il diario
+    /*@Override
+    public BufferedImage getIcona() {
+        return icona;
+    }*/
+
     public String visualizzaDiario() {
         StringBuilder diario = new StringBuilder();
         diario.append("Obiettivo Principale: ").append(obiettivoPrincipale).append("\n\n");

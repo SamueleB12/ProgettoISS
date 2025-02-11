@@ -3,16 +3,15 @@ package com.ProgettoISS;
 import java.awt.image.BufferedImage;
 
 public class Oggetto {
-    
-    private String nome;  
-    private boolean interattivo;  
-    private int x;  
-    private int y;
+
+    private String nome;
     private String descrizione;
     private BufferedImage icona; // Icona dell'oggetto
+    private boolean interattivo;
+    private int x;
+    private int y;
 
-
-    public Oggetto(String nome, boolean interattivo, int x, int y) {
+    public Oggetto(String nome, String descrizione, BufferedImage icona, boolean interattivo, int x, int y) {
         this.nome = nome;
         this.descrizione = descrizione;
         this.icona = icona;
@@ -25,10 +24,6 @@ public class Oggetto {
         return nome;
     }
 
-    public boolean isInterattivo() {
-        return interattivo;
-    }
-
     public String getDescrizione() {
         return descrizione;
     }
@@ -37,6 +32,9 @@ public class Oggetto {
         return icona;
     }
 
+    public boolean isInterattivo() {
+        return interattivo;
+    }
 
     public int getX() {
         return x;

@@ -56,6 +56,10 @@ public class Gioco extends Canvas implements KeyListener {
     private boolean downPressed = false;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
+    private JFrame finestraInventarioAperta = null;
+    private JFrame finestraDiarioAperta = null;
+    private boolean giocoInPausa = false; // Variabile per la pausa del gioco
+
 
 
     public Gioco() {
@@ -66,7 +70,29 @@ public class Gioco extends Canvas implements KeyListener {
         camera = new Camera(sfondo.getWidth(), sfondo.getHeight(), LARGHEZZA, ALTEZZA, 1.5);
         setFocusable(true); // Necessario per ricevere input da tastiera
         this.inventario = new Inventario(); // ✅ Assicura che l'inventario sia sempre inizializzato
-        diario = new Diario("Recuperare l'oggetto di valore"); // Inizializza il diario con l'obiettivo principale
+        diario = new Diario(); // Inizializza il diario con l'obiettivo principale
+
+        // Aggiunta oggetti inventario
+        String percorsoIconaBroccolo = "/immagini/Broccolo.png";
+        BufferedImage iconaBroccolo = caricaImmagine(percorsoIconaBroccolo);
+        Broccolo broccolo = new Broccolo("Broccolo", "Un vegetale sano", iconaBroccolo, 150, 300);
+        giocatore.getInventario().aggiungiOggetto(broccolo);
+
+        // Crea e aggiungi la chiave all'inventario del giocatore
+        String percorsoIconaChiave = "/immagini/Chiave.png";
+        BufferedImage iconaChiave = caricaImmagine(percorsoIconaChiave);
+        Chiave chiave = new Chiave("Chiave", "Una chiave dorata", iconaChiave, 200, 300);
+        giocatore.getInventario().aggiungiOggetto(chiave);
+
+        // Crea e aggiungi la lancetta di orologio all'inventario del giocatore
+        String percorsoIconaLancetta = "/immagini/LancettaOrologio.png";
+        BufferedImage iconaLancetta = caricaImmagine(percorsoIconaLancetta);
+        LancettaOrologio lancetta = new LancettaOrologio("Lancetta Orologio", "Una lancetta di un orologio antico", iconaLancetta, 250, 350);
+        giocatore.getInventario().aggiungiOggetto(lancetta);
+
+        giocatore.getInventario().aggiungiOggetto(diario);
+
+
     }
 
 
@@ -127,6 +153,21 @@ public class Gioco extends Canvas implements KeyListener {
 
     }
 
+    private BufferedImage caricaImmagine(String percorso) {
+        try {
+            URL urlImmagine = getClass().getResource(percorso);
+            if (urlImmagine != null) {
+                return ImageIO.read(urlImmagine);
+            } else {
+                System.err.println("Immagine non trovata: " + percorso);
+                return null;
+            }
+        } catch (IOException e) {
+            System.err.println("Errore nel caricamento dell'immagine: " + e.getMessage());
+            return null;
+        }
+    }
+
     public void avvia(JFrame finestra) {
         // Rimuovi tutti i componenti esistenti dalla finestra principale
         finestra.getContentPane().removeAll();
@@ -138,6 +179,13 @@ public class Gioco extends Canvas implements KeyListener {
         bottoneDiario.addActionListener(e -> mostraDiario());
         bottoneDiario.setPreferredSize(new Dimension(150, 40));
         pannelloSuperiore.add(bottoneDiario);
+
+        JButton bottoneInventario = new JButton("Apri Inventario");
+        bottoneInventario.addActionListener(e -> {
+            mostraInventario(); // Mostra l'inventario quando clicchi sul pulsante
+            giocoInPausa = true; // Metti il gioco in pausa
+        });
+        pannelloSuperiore.add(bottoneInventario, BorderLayout.EAST);
 
         JButton bottoneSalva = new JButton("Salva il Gioco");
         bottoneSalva.setPreferredSize(new Dimension(150, 40));
@@ -261,18 +309,67 @@ public class Gioco extends Canvas implements KeyListener {
     }
 
     public void mostraDiario() {
-        JFrame finestraDiario = new JFrame("Diario di Bordo");
-        JTextArea areaTesto = new JTextArea(diario.visualizzaDiario());
+        if (finestraDiarioAperta == null || !finestraDiarioAperta.isVisible()) {
+            finestraDiarioAperta = new JFrame("Diario di Bordo");
 
-        areaTesto.setEditable(false); // Rendi l'area di testo non modificabile
-        areaTesto.setFont(new Font("Monospaced", Font.PLAIN, 12)); // Imposta un font monospaziato
+            // Carica l'immagine di sfondo
+            String percorsoSfondoDiario = "/immagini/SfondoDiario.jpeg";
+            BufferedImage sfondoDiario = caricaImmagine(percorsoSfondoDiario);
 
-        JScrollPane scrollPane = new JScrollPane(areaTesto);
+            // Crea un pannello con l'immagine di sfondo
+            JPanel pannelloSfondo = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    if (sfondoDiario != null) {
+                        // Disegna l'immagine di sfondo senza ridimensionarla
+                        g.drawImage(sfondoDiario, 0, 0, sfondoDiario.getWidth(), sfondoDiario.getHeight(), this);
+                    }
+                }
 
-        finestraDiario.add(scrollPane);
-        finestraDiario.setSize(400, 600);
-        finestraDiario.setLocationRelativeTo(null); // Centra la finestra
-        finestraDiario.setVisible(true);
+                @Override
+                public Dimension getPreferredSize() {
+                    // Imposta le dimensioni preferite in base alle dimensioni dell'immagine
+                    return new Dimension(sfondoDiario.getWidth(), sfondoDiario.getHeight());
+                }
+            };
+            pannelloSfondo.setLayout(new BorderLayout());
+
+            JTextArea areaTesto = new JTextArea(diario.visualizzaDiario());
+            areaTesto.setEditable(false);
+            areaTesto.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            areaTesto.setOpaque(false);
+
+            // Aggiungi un pannello per i margini attorno all'area di testo
+            JPanel pannelloMargini = new JPanel(new BorderLayout());
+            pannelloMargini.setOpaque(false); // Rendi trasparente il pannello dei margini
+            pannelloMargini.setBorder(BorderFactory.createEmptyBorder(20, 70, 20, 30)); // Margini: top, left, bottom, right (aumento ulteriore margine sinistro)
+            pannelloMargini.add(areaTesto, BorderLayout.CENTER);
+
+            JScrollPane scrollPane = new JScrollPane(pannelloMargini);
+            scrollPane.setOpaque(false);
+            scrollPane.getViewport().setOpaque(false);
+
+            pannelloSfondo.add(scrollPane, BorderLayout.CENTER);
+
+            int larghezzaFinestra = sfondoDiario.getWidth() + 100; // Aumenta la larghezza della finestra
+            int altezzaFinestra = sfondoDiario.getHeight();
+
+            finestraDiarioAperta.setContentPane(pannelloSfondo);
+            finestraDiarioAperta.setSize(larghezzaFinestra, altezzaFinestra);
+            finestraDiarioAperta.setResizable(false);
+            finestraDiarioAperta.setLocationRelativeTo(null);
+            finestraDiarioAperta.setVisible(true);
+
+            finestraDiarioAperta.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                    finestraDiarioAperta = null;
+                }
+            });
+        } else {
+            finestraDiarioAperta.toFront();
+        }
     }
 
     private void mostraFinestraSalvataggio() {
@@ -356,46 +453,93 @@ public class Gioco extends Canvas implements KeyListener {
 
 
     public void mostraInventario() {
-        JFrame finestraInventario = new JFrame("Inventario");
-        JPanel pannello = new JPanel();
-        pannello.setLayout(new BoxLayout(pannello, BoxLayout.Y_AXIS));
+        if (finestraInventarioAperta == null || !finestraInventarioAperta.isVisible()) {
+            finestraInventarioAperta = new JFrame("Inventario");
 
-        // Ottieni l'inventario del giocatore
-        Inventario inventario = giocatore.getInventario();
+            // Carica l'immagine di sfondo
+            String percorsoSfondoInventario = "/immagini/SfondoInventario.jpg";
+            BufferedImage sfondoInventario = caricaImmagine(percorsoSfondoInventario);
 
-        // Aggiungi ogni oggetto all'inventario
-        for (Oggetto oggetto : inventario.getOggetti()) {
-            JLabel etichetta = new JLabel(oggetto.getNome()); // Nome dell'oggetto
-            pannello.add(etichetta);
+            // Crea un pannello con l'immagine di sfondo
+            JPanel pannelloSfondo = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    if (sfondoInventario != null) {
+                        g.drawImage(sfondoInventario, 0, 0, getWidth(), getHeight(), this);
+                    }
+                }
+            };
+            BoxLayout boxLayout = new BoxLayout(pannelloSfondo, BoxLayout.Y_AXIS);
+            pannelloSfondo.setLayout(boxLayout);
 
-            // Aggiungi un'etichetta per la descrizione
-            JLabel descrizioneLabel = new JLabel(oggetto.getDescrizione());
-            pannello.add(descrizioneLabel);
+            // Aggiungi un margine superiore più grande al primo elemento
+            pannelloSfondo.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0)); // 30 pixel di margine superiore
 
-            // Pulsante "Usa"
-            JButton usaButton = new JButton("Usa");
-            usaButton.addActionListener(e -> {
-                // Logica per usare l'oggetto
-                System.out.println("Hai usato: " + oggetto.getNome());
-                // Puoi anche implementare logica per rimuovere l'oggetto dall'inventario se necessario
+            // Ottieni l'inventario del giocatore
+            Inventario inventario = giocatore.getInventario();
+
+            // Aggiungi ogni oggetto all'inventario
+            for (Oggetto oggetto : inventario.getOggetti()) {
+                JPanel oggettoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // Pannello per ogni oggetto
+                oggettoPanel.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5)); // Aggiungi un po' di padding
+                oggettoPanel.setOpaque(false); // Rendi trasparente il pannello dell'oggetto
+
+                // Aggiungi l'immagine dell'oggetto (se presente)
+                BufferedImage icona = oggetto.getIcona();
+                if (icona != null) {
+                    // Ridimensiona l'icona
+                    Image immagineRidimensionata = icona.getScaledInstance(40, 40, Image.SCALE_SMOOTH); // Ridimensiona a 40x40
+                    ImageIcon imageIcon = new ImageIcon(immagineRidimensionata);
+                    JLabel iconaLabel = new JLabel(imageIcon);
+                    oggettoPanel.add(iconaLabel);
+                }
+
+                // Aggiungi il nome dell'oggetto
+                JLabel etichetta = new JLabel(oggetto.getNome()); // Nome dell'oggetto
+                oggettoPanel.add(etichetta);
+
+                // Pulsante "Usa"
+                JButton usaButton = new JButton("Usa");
+                usaButton.addActionListener(e -> {
+                    // Logica per usare l'oggetto
+                    System.out.println("Hai usato: " + oggetto.getNome());
+                    oggetto.interagisci(); // Chiama il metodo interagisci dell'oggetto
+                });
+                oggettoPanel.add(usaButton);
+
+                JButton esaminaButton = new JButton("Esamina");
+                esaminaButton.addActionListener(e -> {
+                    // Logica per esaminare l'oggetto
+                    System.out.println("Esaminando: " + oggetto.getNome());
+                    JOptionPane.showMessageDialog(finestraInventarioAperta, oggetto.getDescrizione()); // Mostra la descrizione in un popup
+                });
+                oggettoPanel.add(esaminaButton);
+
+                pannelloSfondo.add(oggettoPanel);
+            }
+
+            JScrollPane scrollPane = new JScrollPane(pannelloSfondo);
+            scrollPane.setOpaque(false);
+            scrollPane.getViewport().setOpaque(false);
+
+            finestraInventarioAperta.setContentPane(scrollPane);
+            finestraInventarioAperta.setSize(400, 600);
+            finestraInventarioAperta.setLocationRelativeTo(null); // Centra la finestra
+            finestraInventarioAperta.setVisible(true);
+
+            // Quando la finestra dell'inventario viene chiusa, riprendi il gioco
+            finestraInventarioAperta.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                    finestraInventarioAperta = null;
+                    giocoInPausa = false;
+                    requestFocusInWindow(); // Riacquisisci il focus
+                }
             });
-            pannello.add(usaButton);
-
-            // Pulsante "Esamina"
-            JButton esaminaButton = new JButton("Esamina");
-            esaminaButton.addActionListener(e -> {
-                // Logica per esaminare l'oggetto
-                System.out.println("Esaminando: " + oggetto.getNome());
-            });
-            pannello.add(esaminaButton);
-
-            pannello.add(Box.createVerticalStrut(10)); // Spazio tra gli oggetti
+        } else {
+            finestraInventarioAperta.toFront(); // Porta la finestra esistente in primo piano
         }
-
-        finestraInventario.add(pannello);
-        finestraInventario.setSize(400, 600);
-        finestraInventario.setLocationRelativeTo(null); // Centra la finestra
-        finestraInventario.setVisible(true);
     }
 
     @Override
@@ -425,6 +569,9 @@ public class Gioco extends Canvas implements KeyListener {
             case KeyEvent.VK_MINUS: // Tasto - per ridurre lo zoom
                 camera.setZoom(Math.max(camera.getZoom() - 0.1, 1.0)); // Limite min zoom 1.0x
                 break;
+            case KeyEvent.VK_I:
+                mostraInventario();
+
         }
     }
 

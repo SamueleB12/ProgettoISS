@@ -18,7 +18,7 @@ public class ControlloGiocatore extends KeyAdapter {
         this.giocatore = giocatore;
         this.visuale = visuale;
         this.diario = diario;
-        diario = new Diario("Recuperare l'oggetto di valore"); // Inizializza il diario
+        diario = new Diario(); // Inizializza il diario
     }
 
     @Override

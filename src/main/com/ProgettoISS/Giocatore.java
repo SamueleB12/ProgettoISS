@@ -44,7 +44,7 @@ public class Giocatore {
 
     public Diario getDiario() {
         if (this.diario == null) {
-            this.diario = new Diario("Recuperare l'oggetto di valore"); // ✅ Se è null, lo inizializziamo
+            this.diario = new Diario(); // ✅ Se è null, lo inizializziamo
         }
         return this.diario;
     }
@@ -132,7 +132,7 @@ public class Giocatore {
             if (giocatoreCaricato.getDiario() != null) {
                 instance.diario = giocatoreCaricato.getDiario();
             } else {
-                instance.diario = new Diario("Obiettivo iniziale");
+                instance.diario = new Diario();
             }
         }
     }
