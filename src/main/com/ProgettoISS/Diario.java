@@ -18,7 +18,7 @@ public class Diario extends Oggetto {
 
 
     // Costruttore senza argomenti
-    public Diario() {
+   public Diario() {
         super("Diario", "Un diario per annotare missioni ed enigmi", null, false, 0, 0);
         this.obiettivoPrincipale = "Obiettivo non definito";
         this.enigmiCompletati = new ArrayList<>();

@@ -26,6 +26,8 @@ public class Salone extends Canvas implements Runnable, KeyListener {
         impostaCollisioni();
         addKeyListener(this); // ✅ Usa la stessa classe come KeyListener
         setFocusable(true);
+        this.setPreferredSize(new Dimension(1080, 720));
+        this.setBounds(0, 0, 1080, 720);
         camera = new Camera(sfondo.getWidth(), sfondo.getHeight(), 1080, 720, 1.5);
         avvia(finestra);
     }
@@ -75,7 +77,6 @@ public class Salone extends Canvas implements Runnable, KeyListener {
             case KeyEvent.VK_RIGHT:
                 posX += 3;
                 break;
-
         }
     }
 
@@ -100,7 +101,7 @@ public class Salone extends Canvas implements Runnable, KeyListener {
     public void run() {
         while (running) {
             update();
-            repaint();
+            disegna(); // ✅ Usa il metodo corretto per disegnare
             try {
                 Thread.sleep(16);
             } catch (InterruptedException e) {
@@ -125,13 +126,16 @@ public class Salone extends Canvas implements Runnable, KeyListener {
             g.drawImage(sfondo, 0, 0, getWidth(), getHeight(), this);
         }
 
+        if (personaggio != null) {
+            g.drawImage(personaggio, posX, posY, this);
+        }
+
         g.dispose();
         bufferStrategy.show();
     }
 
     @Override
     public void paint(Graphics g) {
-        g.drawImage(sfondo, 0, 0, this);
-        g.drawImage(personaggio, posX, posY, this);
+        disegna(); // ✅ Usa il metodo `disegna()`
     }
 }

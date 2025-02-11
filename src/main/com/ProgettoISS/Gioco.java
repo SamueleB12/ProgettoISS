@@ -70,7 +70,7 @@ public class Gioco extends Canvas implements KeyListener {
         camera = new Camera(sfondo.getWidth(), sfondo.getHeight(), LARGHEZZA, ALTEZZA, 1.5);
         setFocusable(true); // Necessario per ricevere input da tastiera
         this.inventario = new Inventario(); // ✅ Assicura che l'inventario sia sempre inizializzato
-        diario = new Diario(); // Inizializza il diario con l'obiettivo principale
+        diario = new Diario("Recuperare l'oggetto di valore", "/immagini/Diario.png"); // Inizializza il diario con l'obiettivo principale
 
         // Aggiunta oggetti inventario
         String percorsoIconaBroccolo = "/immagini/Broccolo.png";
@@ -669,9 +669,13 @@ public class Gioco extends Canvas implements KeyListener {
     private void entraNelSalone() {
         System.out.println("Entrando nel Salone...");
         JFrame finestra = (JFrame) SwingUtilities.getWindowAncestor(this);
-        new Salone(finestra);
+        if (finestra != null) {
+            finestra.getContentPane().removeAll(); // Rimuove la vecchia schermata
+            finestra.add(new Salone(finestra)); // ✅ Passa il JFrame come argomento
+            finestra.revalidate();
+            finestra.repaint();
+        }
     }
-
 
     private boolean giocoAvviato = false;
 
