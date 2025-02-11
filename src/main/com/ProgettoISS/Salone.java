@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -27,6 +28,12 @@ public class Salone extends Canvas implements Runnable, KeyListener {
         setFocusable(true);
         camera = new Camera(sfondo.getWidth(), sfondo.getHeight(), 1080, 720, 1.5);
         avvia(finestra);
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        createBufferStrategy(2); // Usa doppio buffering
     }
 
     private void caricaRisorse() {
@@ -104,6 +111,22 @@ public class Salone extends Canvas implements Runnable, KeyListener {
 
     private void update() {
         camera.update(posX, posY);
+    }
+
+    private void disegna() {
+        BufferStrategy bufferStrategy = getBufferStrategy();
+        if (bufferStrategy == null) return;
+
+        Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
+        g.clearRect(0, 0, getWidth(), getHeight());
+
+        // Disegna l'immagine del salone centrata
+        if (sfondo != null) {
+            g.drawImage(sfondo, 0, 0, getWidth(), getHeight(), this);
+        }
+
+        g.dispose();
+        bufferStrategy.show();
     }
 
     @Override
