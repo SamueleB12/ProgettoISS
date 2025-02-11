@@ -7,7 +7,7 @@ public class OggettoTest {
 
     @BeforeEach
     public void setUp() {
-        broccolo = new Oggetto("Broccolo", true, 300, 200); // Crea un oggetto broccolo
+        broccolo = new Oggetto("Broccolo", "Un vegetale sano", null, true, 150, 300);
     }
 
     @Test

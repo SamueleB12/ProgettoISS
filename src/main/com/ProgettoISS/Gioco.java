@@ -571,6 +571,7 @@ public class Gioco extends Canvas implements KeyListener {
                 break;
             case KeyEvent.VK_I:
                 mostraInventario();
+                break;
 
         }
     }
@@ -629,6 +630,10 @@ public class Gioco extends Canvas implements KeyListener {
             posY = nuovoY;
         }
 
+        if (posX >=784 && posY == 712) { // Cambia le coordinate in base alla porta della magione
+            entraNelSalone();
+        }
+
         camera.update(posX, posY);
 
         if (isMoving) {
@@ -659,6 +664,12 @@ public class Gioco extends Canvas implements KeyListener {
                 personaggio = spriteDestra[frameIndex];
                 break;
         }
+    }
+
+    private void entraNelSalone() {
+        System.out.println("Entrando nel Salone...");
+        JFrame finestra = (JFrame) SwingUtilities.getWindowAncestor(this);
+        new Salone(finestra);
     }
 
 

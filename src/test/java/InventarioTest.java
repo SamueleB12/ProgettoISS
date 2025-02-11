@@ -15,8 +15,8 @@ class InventarioTest {
     @BeforeEach
     void setUp() {
         inventario = new Inventario();
-        chiave = new Oggetto("Chiave d'oro", true, 1, 100); // Usa i parametri corretti
-        libro = new Oggetto("Libro antico", false, 2, 50);
+        chiave = new Oggetto("Chiave d'oro","Una chiave dorata",null, true, 0, 0); // Usa i parametri corretti
+        libro = new Oggetto("Libro antico", "Un libro rovinato",null ,true,2, 50);
     }
 
     @Test

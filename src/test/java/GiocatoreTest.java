@@ -34,7 +34,7 @@ public class GiocatoreTest {
 
     @Test
     public void testAggiungiOggetto() {
-        Oggetto broccolo = new Oggetto("Broccolo", true, 300, 200);
+        Oggetto broccolo = new Oggetto("Broccolo", "Un vegetale sano", null, true, 150, 300);
         giocatore.aggiungiOggetto(broccolo); // Aggiunge un oggetto al giocatore
         
         List<Oggetto> oggetti = giocatore.getOggetti(); // Ottiene gli oggetti raccolti

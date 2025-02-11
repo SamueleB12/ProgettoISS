@@ -18,8 +18,8 @@ class InventarioMementoTest {
     @Test
     void testSalvataggioERipristinoInventario() {
         // 🔹 Crea alcuni oggetti di test
-        Oggetto oggetto1 = new Oggetto("Oggetto1", true, 5, 10);
-        Oggetto oggetto2 = new Oggetto("Oggetto2", false, 3, 15);
+        Oggetto oggetto1 = new Oggetto("Oggetto1", "prova", null, true, 0, 0);
+        Oggetto oggetto2 = new Oggetto("Oggetto2", "false", null, false, 0, 0);
 
         // 🔹 Aggiungi oggetti all'inventario
         inventario.aggiungiOggetto(oggetto1);
