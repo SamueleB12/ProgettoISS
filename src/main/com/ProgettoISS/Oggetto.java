@@ -1,5 +1,6 @@
 package com.ProgettoISS;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Oggetto {
@@ -10,6 +11,7 @@ public class Oggetto {
     private boolean interattivo;
     private int x;
     private int y;
+    private int larghezza, altezza; // Per la collisione
 
     public Oggetto(String nome, String descrizione, BufferedImage icona, boolean interattivo, int x, int y) {
         this.nome = nome;
@@ -18,6 +20,8 @@ public class Oggetto {
         this.interattivo = interattivo;
         this.x = x;
         this.y = y;
+        this.larghezza = larghezza;
+        this.altezza = altezza;
     }
 
     public String getNome() {
@@ -42,6 +46,10 @@ public class Oggetto {
 
     public int getY() {
         return y;
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, larghezza, altezza);
     }
 
     public void interagisci() {

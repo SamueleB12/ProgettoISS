@@ -13,8 +13,8 @@ import java.awt.image.BufferStrategy;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Objects;
-import com.badlogic.gdx.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class Gioco extends Canvas implements KeyListener {
 
@@ -32,6 +32,10 @@ public class Gioco extends Canvas implements KeyListener {
     };
     private ArrayList<Rectangle> collisioni; // Aree di collisione
     private Inventario inventario;
+    private List<Rectangle> vasiInterattivi = new ArrayList<>();
+    private List<Integer> sequenzaInserita = new ArrayList<>();
+    private List<Integer> sequenzaCorretta = Arrays.asList(1, 3, 2, 4, 6, 5); // Combinazione corretta
+    private boolean portaAperta = false; // Indica se la porta è aperta
 
     private static final String NOME_GIOCO = "L'eredità di Cincenzio";
     private Giocatore giocatore = Giocatore.getInstance(); // ✅ Usa il metodo statico getInstance()
@@ -65,6 +69,7 @@ public class Gioco extends Canvas implements KeyListener {
     public Gioco() {
         caricaRisorse();
         impostaCollisioni(); // Aggiunge le zone di collisione
+        impostaVasi();
         addKeyListener(this);
         giocatore = Giocatore.getInstance(); // Singleton
         camera = new Camera(sfondo.getWidth(), sfondo.getHeight(), LARGHEZZA, ALTEZZA, 1.5);
@@ -151,6 +156,18 @@ public class Gioco extends Canvas implements KeyListener {
 
 
 
+    }
+
+    private void impostaVasi() {
+        // Posizioni dei vasi (coordinate X, Y, larghezza, altezza)
+        vasiInterattivi.add(new Rectangle(450, 760, 32, 32)); // Vaso 1
+        vasiInterattivi.add(new Rectangle(512, 760, 32, 32)); // Vaso 2
+        vasiInterattivi.add(new Rectangle(610, 760, 32, 32)); // Vaso 3
+        vasiInterattivi.add(new Rectangle(675, 760, 32, 32)); // Vaso 4
+        vasiInterattivi.add(new Rectangle(930, 760, 32, 32));
+        vasiInterattivi.add(new Rectangle(1090, 760, 32, 32));
+
+        System.out.println("✅ Vasi interattivi inizializzati: " + vasiInterattivi.size());
     }
 
     private BufferedImage caricaImmagine(String percorso) {
@@ -303,6 +320,13 @@ public class Gioco extends Canvas implements KeyListener {
         for (Rectangle r : collisioni) {
             g.fillRect(r.x - cameraX, r.y - cameraY, r.width, r.height);
         }*/
+
+
+            g.setColor(new Color(255, 0, 255, 100)); // viola trasparente per i vasi
+            for (Rectangle vaso : vasiInterattivi) {
+                g.fillRect(vaso.x - cameraX, vaso.y - cameraY, vaso.width, vaso.height);
+            }
+
 
         g.dispose();
         bufferStrategy.show();
@@ -572,7 +596,47 @@ public class Gioco extends Canvas implements KeyListener {
             case KeyEvent.VK_I:
                 mostraInventario();
                 break;
+            case KeyEvent.VK_Z: // Interazione con i vasi
+                interagisciConVasi();
+                break;
 
+        }
+    }
+
+    private void interagisciConVasi() {
+        Rectangle giocatoreBounds = new Rectangle(posX, posY, 32, 32); // Dimensioni del personaggio
+
+        for (int i = 0; i < vasiInterattivi.size(); i++) {
+            Rectangle vaso = vasiInterattivi.get(i);
+
+            if (giocatoreBounds.intersects(vaso)) { // Se il giocatore è sopra un vaso
+                System.out.println("Hai toccato il vaso " + (i + 1));
+                sequenzaInserita.add(i + 1); // Salva l'indice del vaso toccato
+
+                // Controlliamo se la sequenza è completa
+                if (sequenzaInserita.size() == sequenzaCorretta.size()) {
+                    verificaSequenza();
+                }
+                return;
+            }
+        }
+    }
+
+    private void verificaSequenza() {
+        if (sequenzaInserita.equals(sequenzaCorretta)) {
+            System.out.println("✅ Combinazione corretta! La porta si apre!");
+            JOptionPane.showMessageDialog(null, "Hai sbloccato la porta della magione!");
+            portaAperta = true; // ✅ La porta ora è aperta
+        } else {
+            System.out.println("❌ Combinazione errata! Riprova.");
+            JOptionPane.showMessageDialog(null, "Combinazione errata, riprova!");
+            sequenzaInserita.clear(); // Resetta la sequenza
+        }
+    }
+
+    private void verificaIngresso() {
+        if (portaAperta && posX > 670 && posX < 750 && posY < 610) { // Coordinate della porta
+            entraNelSalone();
         }
     }
 
@@ -630,7 +694,7 @@ public class Gioco extends Canvas implements KeyListener {
             posY = nuovoY;
         }
 
-        if (posX >=784 && posY == 712) { // Cambia le coordinate in base alla porta della magione
+        if (portaAperta && posX>=784 && posY == 712) { // Cambia le coordinate in base alla porta della magione
             entraNelSalone();
         }
 
