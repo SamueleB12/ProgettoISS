@@ -16,7 +16,7 @@ public class ControlloGiocatoreTest {
     public void setUp() {
         gioco = new Gioco(); // Crea un'istanza del gioco
         diario = new Diario("Recuperare l'oggetto di valore"); // Inizializza il diario
-        giocatore = Giocatore.getInstance("TestPlayer");
+        giocatore = Giocatore.getInstance();
         visuale = new Visuale("percorso_mappa.png", 1280, 720, gioco); // Passa l'istanza di Gioco
 
         // Passa tutti i parametri richiesti al costruttore

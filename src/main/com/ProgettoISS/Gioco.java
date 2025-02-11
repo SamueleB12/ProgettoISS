@@ -19,6 +19,7 @@ import com.badlogic.gdx.*;
 public class Gioco extends Canvas implements KeyListener {
 
     private Camera camera;
+    private static Giocatore instance;
     private static final int LARGHEZZA = 1080;
     private static final int ALTEZZA = 720;
     private Diario diario;
@@ -30,9 +31,10 @@ public class Gioco extends Canvas implements KeyListener {
             {0, 0, 0, 0, 0}
     };
     private ArrayList<Rectangle> collisioni; // Aree di collisione
+    private Inventario inventario;
 
     private static final String NOME_GIOCO = "L'eredità di Cincenzio";
-    private Giocatore giocatore;
+    private Giocatore giocatore = Giocatore.getInstance(); // ✅ Usa il metodo statico getInstance()
 
     private BufferedImage sfondo = null;
     private BufferedImage personaggio = null; // Immagine del personaggio
@@ -60,10 +62,14 @@ public class Gioco extends Canvas implements KeyListener {
         caricaRisorse();
         impostaCollisioni(); // Aggiunge le zone di collisione
         addKeyListener(this);
+        giocatore = Giocatore.getInstance(); // Singleton
         camera = new Camera(sfondo.getWidth(), sfondo.getHeight(), LARGHEZZA, ALTEZZA, 1.5);
         setFocusable(true); // Necessario per ricevere input da tastiera
+        this.inventario = new Inventario(); // ✅ Assicura che l'inventario sia sempre inizializzato
         diario = new Diario("Recuperare l'oggetto di valore"); // Inizializza il diario con l'obiettivo principale
     }
+
+
 
     private void impostaCollisioni() {
         collisioni = new ArrayList<>();
@@ -126,10 +132,22 @@ public class Gioco extends Canvas implements KeyListener {
         finestra.getContentPane().removeAll();
 
         // Crea un pannello per il pulsante "Apri Diario" e lo aggiunge alla finestra
-        JPanel pannelloSuperiore = new JPanel(new BorderLayout());
+        JPanel pannelloSuperiore = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
         JButton bottoneDiario = new JButton("Apri Diario");
-        bottoneDiario.addActionListener(e -> mostraDiario()); // Mostra il diario quando clicchi sul pulsante
-        pannelloSuperiore.add(bottoneDiario, BorderLayout.WEST);
+        bottoneDiario.addActionListener(e -> mostraDiario());
+        bottoneDiario.setPreferredSize(new Dimension(150, 40));
+        pannelloSuperiore.add(bottoneDiario);
+
+        JButton bottoneSalva = new JButton("Salva il Gioco");
+        bottoneSalva.setPreferredSize(new Dimension(150, 40));
+        bottoneSalva.addActionListener(e -> mostraFinestraSalvataggio());
+        pannelloSuperiore.add(bottoneSalva);
+
+        JButton bottoneCarica = new JButton("Carica Partita");
+        bottoneCarica.setPreferredSize(new Dimension(150, 40));
+        bottoneCarica.addActionListener(e -> mostraFinestraCaricamento());
+        pannelloSuperiore.add(bottoneCarica);
 
         finestra.add(pannelloSuperiore, BorderLayout.NORTH); // Aggiungi il pannello superiore
         finestra.add(this, BorderLayout.CENTER); // Aggiungi il pannello del gioco
@@ -233,10 +251,10 @@ public class Gioco extends Canvas implements KeyListener {
         }
 
         // Disegna le collisioni per il debug
-        g.setColor(new Color(255, 0, 0, 100)); // Rosso trasparente
+       /* g.setColor(new Color(255, 0, 0, 100)); // Rosso trasparente
         for (Rectangle r : collisioni) {
             g.fillRect(r.x - cameraX, r.y - cameraY, r.width, r.height);
-        }
+        }*/
 
         g.dispose();
         bufferStrategy.show();
@@ -256,6 +274,86 @@ public class Gioco extends Canvas implements KeyListener {
         finestraDiario.setLocationRelativeTo(null); // Centra la finestra
         finestraDiario.setVisible(true);
     }
+
+    private void mostraFinestraSalvataggio() {
+        System.out.println("Finestra di salvataggio aperta!"); // Debug
+        JFrame finestraSalvataggio = new JFrame("Seleziona Slot di Salvataggio");
+        JPanel pannello = new JPanel();
+        pannello.setLayout(new GridLayout(3, 1));
+
+        for (int i = 1; i <= 3; i++) {
+            int slot = i;
+            JButton slotButton = new JButton("Slot " + i);
+            slotButton.addActionListener(e -> {
+                System.out.println("Slot " + slot + " selezionato"); // Debug
+                int conferma = JOptionPane.showConfirmDialog(
+                        finestraSalvataggio,
+                        "Vuoi salvare il gioco nello Slot " + slot + "?",
+                        "Conferma Salvataggio",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (conferma == JOptionPane.YES_OPTION) {
+                    if (giocatore == null) {
+                        JOptionPane.showMessageDialog(null, "Errore: il giocatore non è stato inizializzato!", "Errore", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    Salvataggi.salvaGioco(giocatore, slot);
+                    JOptionPane.showMessageDialog(finestraSalvataggio, "Salvataggio completato!");
+                    finestraSalvataggio.dispose(); // ✅ Chiude la finestra dopo il salvataggio
+                }
+            });
+
+            pannello.add(slotButton);
+        }
+
+        finestraSalvataggio.add(pannello);
+        finestraSalvataggio.setSize(300, 200);
+        finestraSalvataggio.setLocationRelativeTo(null);
+        finestraSalvataggio.setVisible(true);
+    }
+
+    private void mostraFinestraCaricamento() {
+        JFrame finestraCaricamento = new JFrame("Seleziona Slot di Caricamento");
+        JPanel pannello = new JPanel();
+        pannello.setLayout(new GridLayout(3, 1));
+
+        for (int i = 1; i <= 3; i++) {
+            int slot = i;
+            JButton slotButton = new JButton("Slot " + i);
+            slotButton.addActionListener(e -> {
+                Giocatore giocatoreCaricato = Giocatore.getInstance();
+                if (Salvataggi.caricaGioco(giocatoreCaricato, slot)) {
+                    JOptionPane.showMessageDialog(finestraCaricamento, "Caricamento completato!");
+                    finestraCaricamento.dispose();
+
+                    // ✅ Sincronizza i dati con il Singleton
+                    Giocatore.ripristinaIstanza(giocatoreCaricato);
+                    giocatore = Giocatore.getInstance();
+
+                    // ✅ Verifica che non sia null
+                    if (giocatore == null) {
+                        System.err.println("❌ ERRORE: Il giocatore è null dopo il caricamento!");
+                        return;
+                    }
+
+                    // ✅ Aggiorna la posizione
+                    this.posX = giocatore.getPosizioneX();
+                    this.posY = giocatore.getPosizioneY();
+                    System.out.println("🎮 Personaggio aggiornato -> Posizione X: " + posX + ", Y: " + posY);
+                } else {
+                    JOptionPane.showMessageDialog(finestraCaricamento, "Errore nel caricamento dello Slot " + slot, "Errore", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+
+            pannello.add(slotButton);
+        }
+
+        finestraCaricamento.add(pannello);
+        finestraCaricamento.setSize(300, 200);
+        finestraCaricamento.setLocationRelativeTo(null);
+        finestraCaricamento.setVisible(true);
+    }
+
 
     public void mostraInventario() {
         JFrame finestraInventario = new JFrame("Inventario");
@@ -322,7 +420,7 @@ public class Gioco extends Canvas implements KeyListener {
                 mostraDiario(); // Chiama il metodo per mostrare il diario
                 break;
             case KeyEvent.VK_PLUS: // Tasto + per aumentare lo zoom
-                camera.setZoom(Math.min(camera.getZoom() + 0.1, 3.0)); // Limite max zoom 3.0x
+                camera.setZoom(Math.min(camera.getZoom() + 0.1, 2.0)); // Limite max zoom 3.0x
                 break;
             case KeyEvent.VK_MINUS: // Tasto - per ridurre lo zoom
                 camera.setZoom(Math.max(camera.getZoom() - 0.1, 1.0)); // Limite min zoom 1.0x
@@ -355,22 +453,22 @@ public class Gioco extends Canvas implements KeyListener {
         int nuovoY = posY;
 
         if (upPressed && posY > 0) {
-            nuovoY -= 2.5; // Muovi verso l'alto
+            nuovoY -= 3; // Muovi verso l'alto
             direzione = "su";
             isMoving = true;
         }
         if (downPressed && posY + personaggio.getHeight() < 1224) { // Sostituisci ALTEZZA con un valore più alto
-            nuovoY += 2.5;
+            nuovoY += 3;
             direzione = "giu";
             isMoving = true;
         }
         if (leftPressed && posX > 0) {
-            nuovoX -= 2.5; // Muovi verso sinistra
+            nuovoX -= 3; // Muovi verso sinistra
             direzione = "sinistra";
             isMoving = true;
         }
         if (rightPressed && posX + personaggio.getWidth() < 1515) {
-            nuovoX += 2.5; // Muovi verso destra
+            nuovoX += 3; // Muovi verso destra
             direzione = "destra";
             isMoving = true;
         }
@@ -392,6 +490,10 @@ public class Gioco extends Canvas implements KeyListener {
                 frameDelay = 0;
                 frameIndex = (frameIndex + 1) % spriteGiu.length; // Alterna tra i frame
             }
+
+            Giocatore giocatore = Giocatore.getInstance();
+            giocatore.setPosizioneX(posX);
+            giocatore.setPosizioneY(posY);
         } else {
             frameIndex = 0;
         }
@@ -442,6 +544,9 @@ public class Gioco extends Canvas implements KeyListener {
             finestra.setSize(LARGHEZZA, ALTEZZA);
             finestra.setResizable(false);
             finestra.setLocationRelativeTo(null);
+
+
+            finestra.setLayout(new BorderLayout());
 
             Gioco gioco = new Gioco();
 

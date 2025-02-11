@@ -41,4 +41,23 @@ public class GiocatoreMemento implements Serializable {
         }
         giocatore.setStanzaAttuale(this.stanzaAttuale); // Aggiunto per ripristinare la stanza
     }
+    // ✅ Metodo per ottenere la posizione X salvata
+    public int getPosizioneX() {
+        return posizioneX;
+    }
+
+    // ✅ Metodo per ottenere la posizione Y salvata
+    public int getPosizioneY() {
+        return posizioneY;
+    }
+
+    // ✅ Metodo per ottenere lo stato dell'inventario salvato
+    public InventarioMemento getInventarioMemento() {
+        return inventarioMemento;
+    }
+
+    // ✅ Metodo per ottenere lo stato del diario salvato
+    public DiarioMemento getDiarioMemento() {
+        return diarioMemento;
+    }
 }

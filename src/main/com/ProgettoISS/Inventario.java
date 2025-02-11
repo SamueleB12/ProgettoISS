@@ -21,4 +21,16 @@ public class Inventario {
     public List<Oggetto> getOggetti() {
         return oggetti; // Restituisci la lista degli oggetti
     }
+
+    public void setOggetti(List<Oggetto> nuoviOggetti) {
+        this.oggetti = new ArrayList<>(nuoviOggetti);
+    }
+
+    public InventarioMemento salvaStato() {
+        return new InventarioMemento(this);
+    }
+
+    public void ripristinaStato(InventarioMemento memento) {
+        memento.ripristina(this);
+    }
 }

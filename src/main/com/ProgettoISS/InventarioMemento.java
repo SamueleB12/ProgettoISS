@@ -15,4 +15,6 @@ public class InventarioMemento implements Serializable {
     public void ripristina(Inventario inventario) {
         inventario.setOggetti(this.oggettiSalvati); // Usa il metodo pubblico setOggetti()
     }
+
+
 }

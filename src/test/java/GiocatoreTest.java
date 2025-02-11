@@ -10,7 +10,7 @@ public class GiocatoreTest {
 
     @BeforeEach
     public void setUp() {
-        giocatore = Giocatore.getInstance("TestPlayer"); // Crea un'istanza del giocatore
+        giocatore = Giocatore.getInstance(); // Crea un'istanza del giocatore
     }
 
     @Test

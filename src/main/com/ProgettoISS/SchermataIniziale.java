@@ -66,6 +66,37 @@ public class SchermataIniziale extends JPanel {
     }
 
     private void caricaPartita() {
-        JOptionPane.showMessageDialog(this, "Funzione non ancora implementata.");
+        JFrame finestraCaricamento = new JFrame("Seleziona Slot di Caricamento");
+        JPanel pannello = new JPanel();
+        pannello.setLayout(new GridLayout(3, 1));
+
+        for (int i = 1; i <= 3; i++) {
+            int slot = i;
+            JButton slotButton = new JButton("Slot " + i);
+            slotButton.addActionListener(e -> {
+                Giocatore giocatore = Giocatore.getInstance();
+
+                // Se il salvataggio esiste, carica il gioco
+                if (Salvataggi.caricaGioco(giocatore, slot)) {
+                    JOptionPane.showMessageDialog(finestraCaricamento, "Caricamento completato!");
+                    finestraCaricamento.dispose();
+
+                    // Avvia il gioco dopo il caricamento
+                    Gioco gioco = new Gioco();
+                    gioco.avvia((JFrame) SwingUtilities.getWindowAncestor(this));
+                } else {
+                    JOptionPane.showMessageDialog(finestraCaricamento, "Errore nel caricamento dello Slot " + slot, "Errore", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+
+            pannello.add(slotButton);
+
+
+            finestraCaricamento.add(pannello);
+            finestraCaricamento.setSize(300, 200);
+            finestraCaricamento.setLocationRelativeTo(null);
+            finestraCaricamento.setVisible(true);
+        }
+
     }
 }
