@@ -75,22 +75,22 @@ public class Gioco extends Canvas implements KeyListener {
         camera = new Camera(sfondo.getWidth(), sfondo.getHeight(), LARGHEZZA, ALTEZZA, 1.5);
         setFocusable(true); // Necessario per ricevere input da tastiera
         this.inventario = new Inventario(); // ✅ Assicura che l'inventario sia sempre inizializzato
-        diario = new Diario("Recuperare l'oggetto di valore", "/immagini/Diario.png"); // Inizializza il diario con l'obiettivo principale
+        diario = new Diario("Recuperare l'oggetto di valore", "/Immagini/Diario.png"); // Inizializza il diario con l'obiettivo principale
 
         // Aggiunta oggetti inventario
-        String percorsoIconaBroccolo = "/immagini/Broccolo.png";
+        String percorsoIconaBroccolo = "/Immagini/Broccolo.png";
         BufferedImage iconaBroccolo = caricaImmagine(percorsoIconaBroccolo);
         Broccolo broccolo = new Broccolo("Broccolo", "Un vegetale sano", iconaBroccolo, 150, 300);
         giocatore.getInventario().aggiungiOggetto(broccolo);
 
         // Crea e aggiungi la chiave all'inventario del giocatore
-        String percorsoIconaChiave = "/immagini/Chiave.png";
+        String percorsoIconaChiave = "/Immagini/Chiave.png";
         BufferedImage iconaChiave = caricaImmagine(percorsoIconaChiave);
         Chiave chiave = new Chiave("Chiave", "Una chiave dorata", iconaChiave, 200, 300);
         giocatore.getInventario().aggiungiOggetto(chiave);
 
         // Crea e aggiungi la lancetta di orologio all'inventario del giocatore
-        String percorsoIconaLancetta = "/immagini/LancettaOrologio.png";
+        String percorsoIconaLancetta = "/Immagini/LancettaOrologio.png";
         BufferedImage iconaLancetta = caricaImmagine(percorsoIconaLancetta);
         LancettaOrologio lancetta = new LancettaOrologio("Lancetta Orologio", "Una lancetta di un orologio antico", iconaLancetta, 250, 350);
         giocatore.getInventario().aggiungiOggetto(lancetta);
@@ -321,11 +321,11 @@ public class Gioco extends Canvas implements KeyListener {
             g.fillRect(r.x - cameraX, r.y - cameraY, r.width, r.height);
         }*/
 
-
+/*
             g.setColor(new Color(255, 0, 255, 100)); // viola trasparente per i vasi
             for (Rectangle vaso : vasiInterattivi) {
                 g.fillRect(vaso.x - cameraX, vaso.y - cameraY, vaso.width, vaso.height);
-            }
+            }*/
 
 
         g.dispose();
@@ -337,7 +337,7 @@ public class Gioco extends Canvas implements KeyListener {
             finestraDiarioAperta = new JFrame("Diario di Bordo");
 
             // Carica l'immagine di sfondo
-            String percorsoSfondoDiario = "/immagini/SfondoDiario.jpeg";
+            String percorsoSfondoDiario = "/Immagini/SfondoDiario.jpeg";
             BufferedImage sfondoDiario = caricaImmagine(percorsoSfondoDiario);
 
             // Crea un pannello con l'immagine di sfondo
@@ -481,7 +481,7 @@ public class Gioco extends Canvas implements KeyListener {
             finestraInventarioAperta = new JFrame("Inventario");
 
             // Carica l'immagine di sfondo
-            String percorsoSfondoInventario = "/immagini/SfondoInventario.jpg";
+            String percorsoSfondoInventario = "/Immagini/SfondoInventario.jpg";
             BufferedImage sfondoInventario = caricaImmagine(percorsoSfondoInventario);
 
             // Crea un pannello con l'immagine di sfondo

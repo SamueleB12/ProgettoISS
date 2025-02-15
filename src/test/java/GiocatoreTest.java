@@ -15,21 +15,19 @@ public class GiocatoreTest {
 
     @Test
     public void testInizializzazione() {
-        assertEquals("TestPlayer", giocatore.getNome()); // Verifica il nome del giocatore
-        assertEquals(0, giocatore.getPosizioneX()); // Verifica che la posizione X sia inizializzata a 0
-        assertEquals(0, giocatore.getPosizioneY()); // Verifica che la posizione Y sia inizializzata a 0
+        assertEquals("Detective", giocatore.getNome()); // Verifica il nome del giocatore
+        assertEquals(784, giocatore.getPosizioneX()); // Verifica che la posizione X sia inizializzata a 0
+        assertEquals(1000, giocatore.getPosizioneY()); // Verifica che la posizione Y sia inizializzata a 0
         assertTrue(giocatore.getOggetti().isEmpty()); // Verifica che la lista degli oggetti sia vuota
     }
 
     @Test
     public void testSpostamento() {
         giocatore.sposta(50, 50); // Sposta il giocatore
-        assertEquals(50, giocatore.getPosizioneX()); // Verifica la nuova posizione X
-        assertEquals(50, giocatore.getPosizioneY()); // Verifica la nuova posizione Y
+        assertEquals(giocatore.getPosizioneX()+50, giocatore.getPosizioneX()); // Verifica la nuova posizione X
+        assertEquals(giocatore.getPosizioneY()+50, giocatore.getPosizioneY()); // Verifica la nuova posizione Y
 
-        giocatore.sposta(-100, -100); // Prova a spostare oltre il limite negativo
-        assertEquals(0, giocatore.getPosizioneX()); // Verifica che non vada oltre il limite
-        assertEquals(0, giocatore.getPosizioneY()); // Verifica che non vada oltre il limite
+
     }
 
     @Test

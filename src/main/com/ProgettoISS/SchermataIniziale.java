@@ -38,7 +38,7 @@ public class SchermataIniziale extends JPanel {
 
     private void caricaSfondo() {
         try {
-            sfondo = ImageIO.read(getClass().getResource("/immagini/L'eredità di Cincenzio.jpg"));
+            sfondo = ImageIO.read(getClass().getResource("/Immagini/L'eredità di Cincenzio.jpg"));
         } catch (IOException | IllegalArgumentException e) {
             System.err.println("Errore nel caricamento dello sfondo: " + e.getMessage());
             sfondo = null; // Fallback se non trova l'immagine
